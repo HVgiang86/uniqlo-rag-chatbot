@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from controller import create_prompt, generate, send_continue_chat, send_new_chat
 from model import db, ChatHistory
@@ -9,7 +8,6 @@ from dotenv import load_dotenv
 import ssl
 import os
 
-# ID	Name	Price	Description	Specifications	Rating	Discount	Brand Name	Colors	Type	Dịch Description	Dịch Specifications
 app = Flask(__name__)
 CORS(app)  # Enable CORS
 socketio = SocketIO(app, cors_allowed_origins='*')
