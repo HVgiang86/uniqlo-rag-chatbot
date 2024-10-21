@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from datetime import datetime, timedelta
-from controller import create_prompt, generate, send_continue_chat, send_new_chat
+from new_rag import send_continue_chat
 from model import db, ChatHistory
 from dotenv import load_dotenv
 import ssl
@@ -63,7 +63,7 @@ def get_new_session_number(user_id):
     current_time = datetime.utcnow()
     time_diff = current_time - last_record_time
 
-    if time_diff > timedelta(minutes=5) or len(last_session_records) > 10:
+    if time_diff > timedelta(minutes=5) or len(last_session_records) > 15:
         return last_session_number + 1
 
     return last_session_number
@@ -106,14 +106,14 @@ def send_message():
             session_number = get_new_session_number(user_id)
 
             if session_number > last_session_number:
-                answer = send_new_chat(user_query)
+                answer = send_continue_chat([], user_query)
             else:
                 # Get chat history of the new session
                 chat_history = get_chat_history_by_session(user_id, session_number)
                 if chat_history:
                     answer = send_continue_chat(chat_history, user_query)
                 else:
-                    answer = send_new_chat(user_query)
+                    answer = send_continue_chat([], user_query)
 
             # Save the user query to the chat history
             user_chat_history = ChatHistory(
