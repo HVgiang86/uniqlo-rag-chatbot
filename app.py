@@ -71,26 +71,6 @@ def get_new_session_number(user_id):
 def get_chat_history_by_session(user_id, session_number):
     return db.session.query(ChatHistory).filter_by(user_id=user_id, session_number=session_number).all()
 
-
-@socketio.on('connect')
-def handle_connect():
-    print('Client connected')
-
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    print('Client disconnected')
-
-
-@socketio.on('message')
-def handle_message(data):
-    print('Received message:', data)
-    user_query = data.get('query')
-    if user_query:
-        prompt = create_prompt(user_query)
-        answer = generate(prompt)
-        emit('response', {'answer': answer})
-
 @app.route('/chat', methods=['POST'])
 def send_message():
     try:

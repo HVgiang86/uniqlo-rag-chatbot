@@ -40,7 +40,6 @@ grouped_reviews_df = review_df.groupby('Product ID')
 group_list = [group for _, group in grouped_reviews_df]
 reviews_df = pd.concat(group_list)
 
-
 def text_concat_info(row):
     _id = row["Product ID"]
     _name = row["Name"]
@@ -101,6 +100,7 @@ prompt = ChatPromptTemplate.from_messages(
         ("human", "{input}"),
     ]
 )
+# trigger
 
 qa_prompt = ChatPromptTemplate.from_messages(
     [
@@ -111,11 +111,13 @@ qa_prompt = ChatPromptTemplate.from_messages(
 )
 
 contextualize_q_system_prompt = (
-    "Given a chat history and the latest user question "
-    "which might reference context in the chat history, "
-    "formulate a standalone question which can be understood "
-    "without the chat history. Do NOT answer the question, "
-    "just reformulate it if needed and otherwise return it as is. Write it in Vietnamese."
+    """Given a chat history between an AI chatbot and user
+    that chatbot's message marked with [bot] prefix and user's message marked with [user] prefix,
+    and given the latest user question.
+    which might reference context in the chat history, 
+    formulate a standalone question which can be understood 
+    without the chat history. Do NOT answer the question, 
+    just reformulate it if needed and otherwise return it as is. Write it in Vietnamese."""
 )
 
 contextualize_q_prompt = ChatPromptTemplate.from_messages(
@@ -155,9 +157,10 @@ def send_continue_chat(chat_history, query):
 
     for chat in chat_history:
         chat_query = chat.content
-
         if chat.is_user:
-            history.append(chat_query)
+            history.append("[bot] " + str(chat_query))
+        else:
+            history.append("[user] " + str(chat_query))
 
     response = rag_chain.invoke({"input": query, "chat_history": history})
     return response["answer"]

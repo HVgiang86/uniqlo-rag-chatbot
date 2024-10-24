@@ -121,11 +121,10 @@ def send_continue_chat(chat_history, query):
 
     for chat in chat_history:
         chat_query = chat.content
-
         if chat.is_user:
-            history.append("người dùng:" + chat_query)
+            history.append("[bot] " + str(chat_query))
         else:
-            history.append("bạn:" + chat_query)
+            history.append("[user] " + str(chat_query))
 
     prompt = create_continue_prompt(history, query)
     return generate(prompt)
